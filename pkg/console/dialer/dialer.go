@@ -12,7 +12,7 @@ import (
 
 type Dialer interface {
 	DialVirtHandler(kubevirtClient kubecli.KubevirtClient, vmi *v1.VirtualMachineInstance, tlsConfig *tls.Config) (io.ReadWriteCloser, error)
-	Upgrade(responseWriter http.ResponseWriter, request *http.Request) (io.ReadWriteCloser, error)
+	Upgrade(responseWriter http.ResponseWriter, request *http.Request, responseHeader http.Header) (io.ReadWriteCloser, error)
 }
 
 func New() Dialer {
