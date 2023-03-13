@@ -116,7 +116,7 @@ var _ = Describe("Service tests", func() {
 			DialVirtHandlerFunc: func(_ kubecli.KubevirtClient, _ *v1.VirtualMachineInstance, _ *tls.Config) (io.ReadWriteCloser, error) {
 				panic("DialVirtHandler function not implemented")
 			},
-			UpgradeFunc: func(_ http.ResponseWriter, _ *http.Request) (io.ReadWriteCloser, error) {
+			UpgradeFunc: func(_ http.ResponseWriter, _ *http.Request, _ http.Header) (io.ReadWriteCloser, error) {
 				panic("Upgrade function not defined")
 			},
 		}
@@ -378,7 +378,7 @@ var _ = Describe("Service tests", func() {
 			}
 
 			clientTestSide, clientHandlerSide := newDuplexPipe()
-			testDialer.UpgradeFunc = func(_ http.ResponseWriter, _ *http.Request) (io.ReadWriteCloser, error) {
+			testDialer.UpgradeFunc = func(_ http.ResponseWriter, _ *http.Request, _ http.Header) (io.ReadWriteCloser, error) {
 				return clientHandlerSide, nil
 			}
 
@@ -417,7 +417,7 @@ var _ = Describe("Service tests", func() {
 
 type fakeDialer struct {
 	DialVirtHandlerFunc func(kubevirtClient kubecli.KubevirtClient, vmi *v1.VirtualMachineInstance, tlsConfig *tls.Config) (io.ReadWriteCloser, error)
-	UpgradeFunc         func(responseWriter http.ResponseWriter, request *http.Request) (io.ReadWriteCloser, error)
+	UpgradeFunc         func(responseWriter http.ResponseWriter, request *http.Request, responseHeader http.Header) (io.ReadWriteCloser, error)
 }
 
 var _ dialer.Dialer = &fakeDialer{}
@@ -426,8 +426,8 @@ func (f *fakeDialer) DialVirtHandler(kubevirtClient kubecli.KubevirtClient, vmi 
 	return f.DialVirtHandlerFunc(kubevirtClient, vmi, tlsConfig)
 }
 
-func (f *fakeDialer) Upgrade(responseWriter http.ResponseWriter, request *http.Request) (io.ReadWriteCloser, error) {
-	return f.UpgradeFunc(responseWriter, request)
+func (f *fakeDialer) Upgrade(responseWriter http.ResponseWriter, request *http.Request, responseHeader http.Header) (io.ReadWriteCloser, error) {
+	return f.UpgradeFunc(responseWriter, request, responseHeader)
 }
 
 type duplexPipe struct {
