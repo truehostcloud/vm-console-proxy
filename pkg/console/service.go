@@ -167,7 +167,10 @@ func (s *service) VncHandler(request *restful.Request, response *restful.Respons
 		return
 	}
 
-	clientConn, err := s.websocketDialer.Upgrade(response.ResponseWriter, request.Request)
+	headers := http.Header{
+		"Sec-WebSocket-Protocol": []string{"base64.binary.k8s.io"},
+	}
+	clientConn, err := s.websocketDialer.Upgrade(response.ResponseWriter, request.Request, headers)
 	if err != nil {
 		_ = response.WriteError(http.StatusInternalServerError, fmt.Errorf("failed upgrade client connection: %w", err))
 		return
