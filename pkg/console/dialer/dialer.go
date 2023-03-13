@@ -36,10 +36,10 @@ func (d *dialer) DialVirtHandler(kubevirtClient kubecli.KubevirtClient, vmi *v1.
 	return result.UnderlyingConn(), nil
 }
 
-func (d *dialer) Upgrade(w http.ResponseWriter, r *http.Request) (io.ReadWriteCloser, error) {
+func (d *dialer) Upgrade(w http.ResponseWriter, r *http.Request, h http.Header) (io.ReadWriteCloser, error) {
 	upgrader := kubecli.NewUpgrader()
 	upgrader.HandshakeTimeout = 10 * time.Second
-	conn, err := upgrader.Upgrade(w, r, nil)
+	conn, err := upgrader.Upgrade(w, r, h)
 	if err != nil {
 		return nil, err
 	}
